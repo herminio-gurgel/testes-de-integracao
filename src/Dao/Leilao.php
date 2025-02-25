@@ -77,3 +77,9 @@ class Leilao
         $stm->execute();
     }
 }
+
+/*
+ * 1.4 Por que testar o banco de dados
+ * Mesmo a classe tendo um SQL escrita com erro, todos os testes passam, pois, na prática, não estamos testando esta
+ * classe e sim uma mock dela. Portanto, esse erro só apareceria em tempo de produção.
+ */
