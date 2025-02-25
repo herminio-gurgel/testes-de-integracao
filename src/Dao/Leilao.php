@@ -50,7 +50,7 @@ class Leilao
      */
     private function recuperarLeiloesSeFinalizado(bool $finalizado): array
     {
-        $sql = 'SELECT FROM leiloes WHERE finalizado = ' . ($finalizado ? 1 : 0);
+        $sql = 'SELECT * FROM leiloes WHERE finalizado = ' . ($finalizado ? 1 : 0);
         $stm = $this->con->query($sql, \PDO::FETCH_ASSOC);
 
         $dados = $stm->fetchAll();
@@ -82,4 +82,8 @@ class Leilao
  * 1.4 Por que testar o banco de dados
  * Mesmo a classe tendo um SQL escrita com erro, todos os testes passam, pois, na prática, não estamos testando esta
  * classe e sim uma mock dela. Portanto, esse erro só apareceria em tempo de produção.
+ *
+ * 1.6.2
+ * Corrigido a query SQL, mas retomamos o problema do curso anterior, os teste falha pois ao inserir o dado no banco,
+ * causa erro no assertCount do teste
  */
