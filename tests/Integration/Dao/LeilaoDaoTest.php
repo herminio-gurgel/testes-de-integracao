@@ -9,18 +9,28 @@ use PHPUnit\Framework\TestCase;
 
 class LeilaoDaoTest extends TestCase
 {
-    private $pdo;
+    private static $pdo;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$pdo = new \PDO('sqlite::memory:');
+        self::$pdo->exec('create table leiloes (
+                        id INTEGER primary key,
+                        descricao  TEXT,
+                        finalizado BOOL,
+                        dataInicio TEXT
+                     );');
+    }
 
     protected function setUp(): void
     {
-        $this->pdo = ConnectionCreator::getConnection();
-        $this->pdo->beginTransaction();
+        self::$pdo->beginTransaction();
     }
 
     public function testInsercaoEBuscaDevemFuncionar()
     {
         $leilao = new Leilao('Variante 0Km');
-        $leilaoDao = new LeilaoDao($this->pdo);
+        $leilaoDao = new LeilaoDao(self::$pdo);
 
         $leilaoDao->salva($leilao);
         $leiloes = $leilaoDao->recuperarNaoFinalizados();
@@ -35,7 +45,7 @@ class LeilaoDaoTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->pdo->rollBack();
+        self::$pdo->rollBack();
     }
 }
 
@@ -52,4 +62,9 @@ class LeilaoDaoTest extends TestCase
  * a base de dados sem necessidade.
  * Porém, em escala isso continua sendo um problema, bancos muitos populados ou com baixa eficiência podem causar
  * lentidão nos testes, então é preciso uma solução que use um banco de dados, mas que não seja o mesmo de produção.
+ *
+ * 2.6 Fakes SQLite em memória
+ * O SQLite passa ser executado em memória e através do setUpBeforeClass, para executar a query de criação da estrutura
+ * antes de qualquer outro teste. Como o método setUp executa todas as vezes antes de um teste, então para otimizar essa
+ * estrutura foi movida enquando só as transactions são executadas.
  */
