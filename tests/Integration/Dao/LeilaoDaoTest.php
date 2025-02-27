@@ -34,7 +34,7 @@ class LeilaoDaoTest extends TestCase
     {
         // arrange
         $leilaoDao = new LeilaoDao(self::$pdo);
-        foreach ($leiloes as $leilao){
+        foreach ($leiloes as $leilao) {
             $leilaoDao->salva($leilao);
         }
 
@@ -58,7 +58,7 @@ class LeilaoDaoTest extends TestCase
     {
         // arrange
         $leilaoDao = new LeilaoDao(self::$pdo);
-        foreach ($leiloes as $leilao){
+        foreach ($leiloes as $leilao) {
             $leilaoDao->salva($leilao);
         }
 
@@ -73,6 +73,23 @@ class LeilaoDaoTest extends TestCase
             $leiloes[0]->recuperarDescricao()
         );
         self::assertTrue($leiloes[0]->estaFinalizado());
+    }
+
+    public function testAoAtualizarLeilaoStatusDeveSerAlterado()
+    {
+        //arrange
+        $leilao = new Leilao('Brasília Amarela');
+        $leilaoDao = new LeilaoDao(self::$pdo);
+        $leilao = $leilaoDao->salva($leilao);
+        $leilao->finaliza();
+
+        //act
+        $leilaoDao->atualiza($leilao);
+
+        //assert
+        $leiloes = $leilaoDao->recuperarFinalizados();
+        self::assertCount(1, $leiloes);
+        self::assertSame('Brasília Amarela', $leiloes[0]->recuperarDescricao());
     }
 
     protected function tearDown(): void
@@ -119,4 +136,8 @@ class LeilaoDaoTest extends TestCase
  * Foi discutido sobre testes intermediários, como por exemplo testar se o dado foi mesmo armazenado no BD após o método
  * salva(). Um dos problemas dessa abordagem é quebrar o padrão arrange, act e assert, então foi mais informativo e não
  * aplicado no curso
+ *
+ * 4.2 Inserindo e alterando
+ * Foi incluída um novo teste para verificar se o update está funcionando.
+ *
  */
