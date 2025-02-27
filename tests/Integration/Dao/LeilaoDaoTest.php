@@ -27,14 +27,21 @@ class LeilaoDaoTest extends TestCase
         self::$pdo->beginTransaction();
     }
 
-    public function testInsercaoEBuscaDevemFuncionar()
+    /**
+     * @dataProvider leiloes
+     */
+    public function testBuscaLeiloesNaoFinalizados(array $leiloes)
     {
-        $leilao = new Leilao('Variante 0Km');
+        // arrange
         $leilaoDao = new LeilaoDao(self::$pdo);
+        foreach ($leiloes as $leilao){
+            $leilaoDao->salva($leilao);
+        }
 
-        $leilaoDao->salva($leilao);
+        //act
         $leiloes = $leilaoDao->recuperarNaoFinalizados();
 
+        //assert
         self::assertCount(1, $leiloes);
         self::assertContainsOnlyInstancesOf(Leilao::class, $leiloes);
         self::assertSame(
@@ -43,9 +50,44 @@ class LeilaoDaoTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider leiloes
+     */
+    public function testBuscaLeiloesFinalizados(array $leiloes)
+    {
+        // arrange
+        $leilaoDao = new LeilaoDao(self::$pdo);
+        foreach ($leiloes as $leilao){
+            $leilaoDao->salva($leilao);
+        }
+
+        //act
+        $leiloes = $leilaoDao->recuperarFinalizados();
+
+        //assert
+        self::assertCount(1, $leiloes);
+        self::assertContainsOnlyInstancesOf(Leilao::class, $leiloes);
+        self::assertSame(
+            'Fiat 147 0Km',
+            $leiloes[0]->recuperarDescricao()
+        );
+    }
+
     protected function tearDown(): void
     {
         self::$pdo->rollBack();
+    }
+
+    public function leiloes()
+    {
+        $naoFinalizado = new Leilao('Variante 0Km');
+        $finalizado = new Leilao('Fiat 147 0Km');
+        $finalizado->finaliza();
+        return [
+            [
+                [$naoFinalizado, $finalizado]
+            ]
+        ];
     }
 }
 
@@ -67,4 +109,7 @@ class LeilaoDaoTest extends TestCase
  * O SQLite passa ser executado em memória e através do setUpBeforeClass, para executar a query de criação da estrutura
  * antes de qualquer outro teste. Como o método setUp executa todas as vezes antes de um teste, então para otimizar essa
  * estrutura foi movida enquando só as transactions são executadas.
+ *
+ * 3.2 Buscando finalizados
+ * Reorganizando o código com mais um teste e preparando um dataProvider para evitar duplicação de código
  */
