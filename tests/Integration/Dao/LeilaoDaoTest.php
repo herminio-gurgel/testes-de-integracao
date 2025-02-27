@@ -48,6 +48,7 @@ class LeilaoDaoTest extends TestCase
             'Variante 0Km',
             $leiloes[0]->recuperarDescricao()
         );
+        self::assertFalse($leiloes[0]->estaFinalizado());
     }
 
     /**
@@ -71,6 +72,7 @@ class LeilaoDaoTest extends TestCase
             'Fiat 147 0Km',
             $leiloes[0]->recuperarDescricao()
         );
+        self::assertTrue($leiloes[0]->estaFinalizado());
     }
 
     protected function tearDown(): void
@@ -112,4 +114,9 @@ class LeilaoDaoTest extends TestCase
  *
  * 3.2 Buscando finalizados
  * Reorganizando o código com mais um teste e preparando um dataProvider para evitar duplicação de código
+ *
+ * 3.3 Testes Intermediários
+ * Foi discutido sobre testes intermediários, como por exemplo testar se o dado foi mesmo armazenado no BD após o método
+ * salva(). Um dos problemas dessa abordagem é quebrar o padrão arrange, act e assert, então foi mais informativo e não
+ * aplicado no curso
  */
