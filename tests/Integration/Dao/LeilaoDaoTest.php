@@ -77,19 +77,22 @@ class LeilaoDaoTest extends TestCase
 
     public function testAoAtualizarLeilaoStatusDeveSerAlterado()
     {
-        //arrange
         $leilao = new Leilao('Brasília Amarela');
         $leilaoDao = new LeilaoDao(self::$pdo);
         $leilao = $leilaoDao->salva($leilao);
-        $leilao->finaliza();
 
-        //act
+        $leiloes = $leilaoDao->recuperarNaoFinalizados();
+        self::assertCount(1, $leiloes);
+        self::assertSame('Brasília Amarela', $leiloes[0]->recuperarDescricao());
+        self::assertFalse($leiloes[0]->estaFinalizado());
+
+        $leilao->finaliza();
         $leilaoDao->atualiza($leilao);
 
-        //assert
         $leiloes = $leilaoDao->recuperarFinalizados();
         self::assertCount(1, $leiloes);
         self::assertSame('Brasília Amarela', $leiloes[0]->recuperarDescricao());
+        self::assertTrue($leiloes[0]->estaFinalizado());
     }
 
     protected function tearDown(): void
@@ -140,4 +143,6 @@ class LeilaoDaoTest extends TestCase
  * 4.2 Inserindo e alterando
  * Foi incluída um novo teste para verificar se o update está funcionando.
  *
+ * 4.3 Testes intermediários
+ * Implementação de teste unitário para exemplificar
  */
